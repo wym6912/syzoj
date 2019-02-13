@@ -49,7 +49,7 @@ class ContestPlayer extends Model {
 
   async updateScore(judge_state) {
     await this.loadRelationships();
-    if (this.contest.type === 'ioi') {
+    if (this.contest.type === 'ioi' || this.contest.type === 'ieee') { //以后在这里修改 IEEE 赛制
       if (!judge_state.pending) {
         if (!this.score_details[judge_state.problem_id]) {
           this.score_details[judge_state.problem_id] = {
