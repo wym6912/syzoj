@@ -110,9 +110,9 @@ class JudgeState extends Model {
     else if (this.type === 1) {
       let contest = await Contest.fromID(this.type_info);
       if (contest.isRunning()) {
-        return user && await contest.isSupervisior(user);
+        return user && await contest.isSupervisior(user); //比赛中，只有管理员可以看代码
       } else {
-        return true;
+        return true; //如果比赛结束了，其他人的代码均可以看
       }
     }
   }
