@@ -143,8 +143,8 @@ app.get('/submission/:id', async (req, res) => {
       contest = await Contest.fromID(judge.type_info);
       contest.ended = contest.isEnded();
 
-      if ((!contest.ended || !contest.is_public) &&
-        !(await judge.problem.isAllowedEditBy(res.locals.user) || await contest.isSupervisior(curUser))) {
+      if ((!contest.ended || !contest.is_public) )//&&
+        //!(await judge.problem.isAllowedEditBy(res.locals.user) || await contest.isSupervisior(curUser))) { //这里的意思是只有管理员可以看代码，为什么自己不能看自己在比赛中的代码？（NOI 赛制不行）
         throw new Error("比赛未结束或未公开。");
       }
     }

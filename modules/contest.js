@@ -409,10 +409,10 @@ app.get('/contest/submission/:id', async (req, res) => {
     //if ((!curUser) || judge.user_id !== curUser.id) throw new ErrorMessage("您没有权限执行此操作。");
     if(! curUser) throw new ErrorMessage("您没有权限执行此操作(用户权限不足)");
 
-    if (judge.type !== 1) {
-      return res.redirect(syzoj.utils.makeUrl(['submission', id]));
-    }
-
+    //if (judge.type !== 1) {
+      return res.redirect(syzoj.utils.makeUrl(['submission', id])); //强行让所有的链接指向原来的提交链接
+    //}
+/*
     const contest = await Contest.fromID(judge.type_info);
     contest.ended = contest.isEnded();
 
@@ -442,6 +442,7 @@ app.get('/contest/submission/:id', async (req, res) => {
       displayConfig: displayConfig,
       contest: contest,
     });
+    */
   } catch (e) {
     syzoj.log(e);
     res.render('error', {
