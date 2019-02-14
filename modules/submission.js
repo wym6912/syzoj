@@ -133,22 +133,20 @@ app.get('/submissions', async (req, res) => {
 app.get('/submission/:id', async (req, res) => {
   try {
     const id = parseInt(req.params.id);
-    let user = await User.fromName(req.query.submitter || '');
 
     const judge = await JudgeState.fromID(id);
     if (!judge) throw new ErrorMessage("提交记录 ID 不正确。");
     const curUser = res.locals.user;
     if (!await judge.isAllowedVisitBy(curUser)) throw new ErrorMessage('您没有权限进行此操作。');
-
+    let userN = parseInt(curUser.id), judgeID = parseInt(judge.user_id);
     let contest;
     if (judge.type === 1) {
       contest = await Contest.fromID(judge.type_info);
       contest.ended = contest.isEnded();
-
       if (((!contest.ended || !contest.is_public) &&
-        !(await judge.problem.isAllowedEditBy(res.locals.user) || await contest.isSupervisior(curUser))) ||
-        (user.id !== judge.user_id) ) { //这里的意思是只有管理员可以看代码，为什么自己不能看自己在比赛中的代码？（NOI 赛制不行）
-        throw new Error("比赛未结束或未公开，您不能查看别人的代码！Your id = " + id + ", judge.user_id =" + judge.user_id);
+        !(await judge.problem.isAllowedEditBy(res.locals.user) || await contest.isSupervisior(curUser) || userN === judgeID))
+         ) { //这里的意思是只有管理员可以看代码，为什么自己不能看自己在比赛中的代码？（NOI 赛制不行）
+        throw new Error("比赛未结束或未公开，您不能查看别人的代码！");
       }
     }
 
