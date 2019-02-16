@@ -92,7 +92,7 @@ Vue.component('submission-item', {
   </template>
 
   <td v-if="config.showCode">
-    <% if (active === 'submissions') { %>
+    <% if (active === 'submission') { %>
     <span v-if="data.info.language"><a :href="submissionLink"><b>{{ data.info.language }}</b></a> / </span>
     <% } else { %>
     <span v-if="data.info.language"><b>{{ data.info.language }}</b> / </span>
