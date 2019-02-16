@@ -65,14 +65,14 @@ Vue.component('submission-item', {
   <td><b>#{{ data.info.submissionId }}</b></td>
   <% } %>
   <td ref="problemLabel"><a ref="problemLabelTextFit" style="width: 230px; height: 22px; display: block; margin: 0 auto; line-height: 22px;" :href="problemLink"><b>#{{ config.inContest ? alpha(data.info.problemId) : data.info.problemId }}.</b> {{ data.info.problemName }}</a></td>
-  <% if (active === 'submission') { %>
+  <% if (active === 'submissions') { %>
   <td><a :href="submissionLink"><b><status-label :status="statusString" :progress="progress"></status-label></b></a></td>
   <% } else { %>
   <td><b><status-label :status="statusString" :progress="progress"></status-label></b></td>
   <% } %>
 
   <template v-if="data.result">
-  <% if (active === 'submission') { %>
+  <% if (active === 'submissions') { %>
   <td v-if="config.showScore"><a :href="submissionLink"><span class="score" :class="scoreClass">{{ Math.floor(data.result.score || 0) }}</span></a></td>
   <% } else { %>
   <td v-if="config.showScore"><span class="score" :class="scoreClass">{{ Math.floor(data.result.score || 0) }}</span></td>
@@ -92,7 +92,7 @@ Vue.component('submission-item', {
   </template>
 
   <td v-if="config.showCode">
-    <% if (active === 'submission') { %>
+    <% if (active === 'submissions') { %>
     <span v-if="data.info.language"><a :href="submissionLink"><b>{{ data.info.language }}</b></a> / </span>
     <% } else { %>
     <span v-if="data.info.language"><b>{{ data.info.language }}</b> / </span>
