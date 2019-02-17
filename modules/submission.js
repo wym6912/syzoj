@@ -137,6 +137,7 @@ app.get('/submission/:id', async (req, res) => {
     const judge = await JudgeState.fromID(id);
     if (!judge) throw new ErrorMessage("提交记录 ID 不正确。");
     const curUser = res.locals.user;
+    if(curUser === null) throw new ErrorMessage('请登录后查看提交记录。', { '登录': syzoj.utils.makeUrl(['login'], { 'url': req.originalUrl }) });
     if (!await judge.isAllowedVisitBy(curUser)) throw new ErrorMessage('您没有权限进行此操作。');
     let userN = parseInt(curUser.id), judgeID = parseInt(judge.user_id);
     let contest;
