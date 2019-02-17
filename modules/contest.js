@@ -366,7 +366,7 @@ app.get('/contest/:id/submissions', async (req, res) => {
 
     let paginate = syzoj.utils.paginate(await JudgeState.count(where), req.query.page, syzoj.config.page.judge_state);
     let judge_state = await JudgeState.query(paginate, where, [['submit_time', 'desc']]);
-
+    if (! paginate.pageCnt) throw new ErrorMessage("您在此场比赛中还没有提交，请提交后再试。");
     await judge_state.forEachAsync(async obj => {
       await obj.loadRelationships();
       obj.problem_id = problems_id.indexOf(obj.problem_id) + 1;
