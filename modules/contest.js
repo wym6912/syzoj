@@ -76,7 +76,7 @@ app.post('/contest/:id/edit', async (req, res) => {
       ranklist = await ContestRanklist.create();
 
       // Only new contest can be set type
-      if (!['noi', 'ioi', 'acm', 'ieee'].includes(req.body.type)) throw new ErrorMessage('无效的赛制。');
+      if (!['ioi', 'acm', 'ieee'].includes(req.body.type)) throw new ErrorMessage('无效的赛制。');
       contest.type = req.body.type;
     } else {
       await contest.loadRelationships();
@@ -145,16 +145,7 @@ app.get('/contest/:id', async (req, res) => {
     problems = problems.map(x => ({ problem: x, status: null, judge_id: null, statistics: null }));
     if (player) {
       for (let problem of problems) {
-        if (contest.type === 'noi') {
-          if (player.score_details[problem.problem.id]) {
-            let judge_state = await JudgeState.fromID(player.score_details[problem.problem.id].judge_id);
-            problem.status = judge_state.status;
-            if (!contest.ended && !await problem.problem.isAllowedEditBy(res.locals.user) && !['Compile Error', 'Waiting', 'Compiling'].includes(problem.status)) {
-              problem.status = 'Submitted';
-            }
-            problem.judge_id = player.score_details[problem.problem.id].judge_id;
-          }
-        } else if (contest.type === 'ioi') {
+        if (contest.type === 'ioi') {
           if (player.score_details[problem.problem.id]) {
             let judge_state = await JudgeState.fromID(player.score_details[problem.problem.id].judge_id);
             problem.status = judge_state.status;
@@ -195,18 +186,18 @@ app.get('/contest/:id', async (req, res) => {
       for (let problem of problems) {
         problem.statistics = { attempt: 0, accepted: 0 };
 
-        if (contest.type === 'ioi' || contest.type === 'noi' || contest.type === 'ieee') {
+        if (contest.type === 'ioi' || contest.type === 'ieee') {
           problem.statistics.partially = 0;
         }
 
         for (let player of players) {
           if (player.score_details[problem.problem.id]) {
             problem.statistics.attempt++;
-            if ((contest.type === 'acm' && player.score_details[problem.problem.id].accepted) || ((contest.type === 'noi' || contest.type === 'ioi' || contest.type === 'ieee') && player.score_details[problem.problem.id].score === 100)) {
+            if ((contest.type === 'acm' && player.score_details[problem.problem.id].accepted) || ((contest.type === 'ioi' || contest.type === 'ieee') && player.score_details[problem.problem.id].score === 100)) {
               problem.statistics.accepted++;
             }
 
-            if ((contest.type === 'noi' || contest.type === 'ioi' || contest.type === 'ieee') && player.score_details[problem.problem.id].score > 0) {
+            if ((contest.type === 'ioi' || contest.type === 'ieee') && player.score_details[problem.problem.id].score > 0) {
               problem.statistics.partially++;
             }
           }
@@ -249,7 +240,7 @@ app.get('/contest/:id/ranklist', async (req, res) => {
     let ranklist = await players_id.mapAsync(async player_id => {
       let player = await ContestPlayer.fromID(player_id);
 
-      if (contest.type === 'noi' || contest.type === 'ioi' || contest.type === 'ieee') {
+      if (contest.type === 'ioi' || contest.type === 'ieee') {
         player.score = 0;
       }
 
@@ -257,7 +248,7 @@ app.get('/contest/:id/ranklist', async (req, res) => {
         player.score_details[i].judge_state = await JudgeState.fromID(player.score_details[i].judge_id);
 
         /*** XXX: Clumsy duplication, see ContestRanklist::updatePlayer() ***/
-        if (contest.type === 'noi' || contest.type === 'ioi' || contest.type === 'ieee') {
+        if (contest.type === 'ioi' || contest.type === 'ieee') {
           let multiplier = contest.ranklist.ranking_params[i] || 1.0;
           player.score_details[i].weighted_score = player.score_details[i].score == null ? null : Math.round(player.score_details[i].score * multiplier);
           player.score += player.score_details[i].weighted_score;

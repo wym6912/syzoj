@@ -59,7 +59,7 @@ class Contest extends Model {
       problems: '',
       admins: '',
       information: '',
-      type: 'noi',
+      type: 'ieee',
       start_time: 0,
       end_time: 0,
       holder: 0,
@@ -78,7 +78,7 @@ class Contest extends Model {
     return user && (user.is_admin || this.holder_id === user.id || this.admins.split('|').includes(user.id.toString()));
   }
 
-  allowedSeeingOthers() {
+  allowedSeeingOthers() { //See others' submissions
     if (this.type === 'acm') return true;
     else return false;
   }
@@ -89,8 +89,7 @@ class Contest extends Model {
   }
 
   allowedSeeingResult() { // If not, then the user can only see compile progress
-    if (this.type === 'ioi' || this.type === 'acm' || this.type === 'ieee') return true;
-    else return false;
+    return true;
   }
 
   allowedSeeingTestcase() {

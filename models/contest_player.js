@@ -85,19 +85,6 @@ class ContestPlayer extends Model {
             this.score += this.score_details[x].score;
         }
       }
-    } else if (this.contest.type === 'noi') {
-      if (this.score_details[judge_state.problem_id] && this.score_details[judge_state.problem_id].judge_id > judge_state.id) return;
-
-      this.score_details[judge_state.problem_id] = {
-        score: judge_state.score,
-        judge_id: judge_state.id
-      };
-
-      this.score = 0;
-      for (let x in this.score_details) {
-        if (this.score != null)
-          this.score += this.score_details[x].score;
-      }
     } else if (this.contest.type === 'acm') {
       if (!judge_state.pending) {
         if (!this.score_details[judge_state.problem_id]) {

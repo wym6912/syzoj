@@ -46,7 +46,7 @@ class ContestRanklist extends Model {
 
     let JudgeState = syzoj.model('judge_state');
 
-    if (contest.type === 'noi' || contest.type === 'ioi' || contest.type === 'ieee') {
+    if (contest.type === 'ioi' || contest.type === 'ieee') {
       for (let player of players) {
         player.latest = 0;
         player.score = 0;
