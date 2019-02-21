@@ -44,3 +44,7 @@ ALTER TABLE `problem` ADD `publicize_time` DATETIME NOT NULL DEFAULT CURRENT_TIM
 ```sql
 ALTER TABLE `user` ADD `prefer_formatted_code` TINYINT(1) NOT NULL AFTER `public_email`;
 ```
+# 网站端和评测端的升级方法
+[网站端的升级方法](https://github.com/wym6912/syzoj/wiki/部署指南#更新网站端)
+[评测端的升级方法](https://github.com/wym6912/syzoj/wiki/部署指南#下载-1)
+
