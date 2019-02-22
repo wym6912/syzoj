@@ -150,7 +150,14 @@ app.get('/user/:id/edit', async (req, res) => {
 
 app.get('/forget', async (req, res) => {
   //res.render('forget');
-  throw new ErrorMessage('请加入 QQ 群' + QQGroupNumber + ', 联系管理员找回你的密码。');
+  try {
+    throw new ErrorMessage('请加入 QQ 群' + QQGroupNumber + ', 联系管理员找回你的密码。');
+  } catch(e) {
+    syzoj.log(e);
+    res.render('error', {
+      err: e
+    });
+  }
 });
 
 

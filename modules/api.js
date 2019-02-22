@@ -28,41 +28,6 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
-app.post('/api/forget', async (req, res) => {
-  try {
-    res.setHeader('Content-Type', 'application/json');
-    let user = await User.fromEmail(req.body.email);
-    if (!user) throw 1001;
-    let sendObj = {
-      userId: user.id,
-    };
-
-    const token = jwt.sign(sendObj, syzoj.config.email_jwt_secret, {
-      subject: 'forget',
-      expiresIn: '12h'
-    });
-
-    const vurl = req.protocol + '://' + req.get('host') + syzoj.utils.makeUrl(['api', 'forget_confirm'], { token: token });
-    try {
-      await Email.send(user.email,
-        `${user.username} 的 ${syzoj.config.title} 密码重置邮件`,
-        `<p>请点击该链接来重置密码：</p><p><a href="${vurl}">${vurl}</a></p><p>链接有效期为 12h。如果您不是 ${user.username}，请忽略此邮件。</p>`
-      );
-    } catch (e) {
-      return res.send({
-        error_code: 2010,
-        message: require('util').inspect(e)
-      });
-      return null;
-    }
-
-    res.send({ error_code: 1 });
-  } catch (e) {
-    syzoj.log(e);
-    res.send(JSON.stringify({ error_code: e }));
-  }
-});
-
 // Sign up
 app.post('/api/sign_up', async (req, res) => {
   try {
@@ -123,24 +88,6 @@ app.post('/api/sign_up', async (req, res) => {
   } catch (e) {
     syzoj.log(e);
     res.send(JSON.stringify({ error_code: e }));
-  }
-});
-
-app.get('/api/forget_confirm', async (req, res) => {
-  try {
-    try {
-      jwt.verify(req.query.token, syzoj.config.email_jwt_secret, { subject: 'forget' });
-    } catch (e) {
-      throw new ErrorMessage("Token 不正确。");
-    }
-    res.render('forget_confirm', {
-      token: req.query.token
-    });
-  } catch (e) {
-    syzoj.log(e);
-    res.render('error', {
-      err: e
-    });
   }
 });
 
