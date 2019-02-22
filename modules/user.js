@@ -4,7 +4,7 @@ const RatingHistory = syzoj.model('rating_history');
 const Contest = syzoj.model('contest');
 const ContestPlayer = syzoj.model('contest_player');
 
-const QQGroupNumber = '12345678'; //请替换成您所需要的 QQ 群号
+const QQGroupNumber = syzoj.config.QQGroupNumber;
 
 // Ranklist
 app.get('/ranklist', async (req, res) => {
