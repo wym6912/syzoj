@@ -4,6 +4,8 @@ const RatingHistory = syzoj.model('rating_history');
 const Contest = syzoj.model('contest');
 const ContestPlayer = syzoj.model('contest_player');
 
+const QQGroupNumber = '12345678'; //请替换成您所需要的 QQ 群号
+
 // Ranklist
 app.get('/ranklist', async (req, res) => {
   try {
@@ -147,7 +149,8 @@ app.get('/user/:id/edit', async (req, res) => {
 });
 
 app.get('/forget', async (req, res) => {
-  res.render('forget');
+  //res.render('forget');
+  throw new ErrorMessage('请加入 QQ 群' + QQGroupNumber + ', 联系管理员找回你的密码。');
 });
 
 
