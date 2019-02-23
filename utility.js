@@ -260,6 +260,9 @@ module.exports = {
   isValidUsername(s) {
     return /^[a-zA-Z0-9\-\_]+$/.test(s);
   },
+  isValidEmail(s){
+    return /^\d+@qq.com/.test(s);
+  },
   locks: [],
   lock(key, cb) {
     let s = JSON.stringify(key);

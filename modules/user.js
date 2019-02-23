@@ -183,6 +183,8 @@ app.post('/user/:id/edit', async (req, res) => {
       user.email = req.body.email;
     }
 
+    if (!syzoj.utils.isValidEmail(req.body.email)) throw new ErrorMessage('邮箱必须是 QQ 邮箱，格式为 123456789@qq.com');
+
     if (res.locals.user && res.locals.user.is_admin) {
       if (!req.body.privileges) {
         req.body.privileges = [];
