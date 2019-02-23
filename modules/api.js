@@ -43,6 +43,8 @@ app.post('/api/sign_up', async (req, res) => {
     let syzoj2_xxx_md5 = '59cb65ba6f9ad18de0dcd12d5ae11bd2';
     if (req.body.password === syzoj2_xxx_md5) throw 2007;
     if (!(req.body.email = req.body.email.trim())) throw 2006;
+    var regular = new RegExp(/^\d+@qq.com/);
+    if(! regular.test(req.body.email)) throw 2004;
     if (!syzoj.utils.isValidUsername(req.body.username)) throw 2002;
 
     if (syzoj.config.register_mail) {
@@ -138,7 +140,8 @@ app.get('/api/sign_up_confirm', async (req, res) => {
     if (obj.password === syzoj2_xxx_md5) throw new ErrorMessage('密码不能为空。');
     if (!(obj.email = obj.email.trim())) throw new ErrorMessage('邮件地址不能为空。');
     if (!syzoj.utils.isValidUsername(obj.username)) throw new ErrorMessage('用户名不合法。');
-
+    var regular = new RegExp(/^\d+@qq.com/);
+    if(! regular.test(req.body.email)) throw new ErrorMessage('邮箱必须是 QQ 邮箱，格式为 123456789@qq.com');
     user = await User.create({
       username: obj.username,
       password: obj.password,
@@ -181,7 +184,8 @@ app.get('/api/sign_up/:token', async (req, res) => {
     if (obj.password === syzoj2_xxx_md5) throw new ErrorMessage('密码不能为空。');
     if (!(obj.email = obj.email.trim())) throw new ErrorMessage('邮件地址不能为空。');
     if (!syzoj.utils.isValidUsername(obj.username)) throw new ErrorMessage('用户名不合法。');
-
+    var regular = new RegExp(/^\d+@qq.com/);
+    if(! regular.test(req.body.email)) throw new ErrorMessage('邮箱必须是 QQ 邮箱，格式为 123456789@qq.com');
     user = await User.create({
       username: obj.username,
       password: obj.password,
