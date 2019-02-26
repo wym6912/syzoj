@@ -142,5 +142,11 @@
     "highlight": "vbnet",
     "version": "Mono 4.7",
     "editor": "vbscript"
+  },
+  "php": {
+    "show": "PHP",
+    "highlight": "php",
+    "version": "PHP 7.2.15",
+    "editor": "php"
   }
 }
