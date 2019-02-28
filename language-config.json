@@ -13,6 +13,13 @@
     "editor": "c_cpp",
     "format": "cpp"
   },
+  "cpp14": {
+    "show": "C++ 14",
+    "highlight": "cpp",
+    "version": "GCC 8.2.0",
+    "editor": "c_cpp",
+    "format": "cpp"
+  },
   "cpp17": {
     "show": "C++ 17",
     "highlight": "cpp",
@@ -36,6 +43,13 @@
   },
   "cpp11-clang": {
     "show": "C++ 11 (Clang)",
+    "highlight": "cpp",
+    "version": "Clang 7.0.1",
+    "editor": "c_cpp",
+    "format": "cpp"
+  },
+  "cpp14-clang": {
+    "show": "C++ 14 (Clang)",
     "highlight": "cpp",
     "version": "Clang 7.0.1",
     "editor": "c_cpp",
@@ -148,5 +162,11 @@
     "highlight": "php",
     "version": "PHP 7.2.15",
     "editor": "php"
+  },
+  "scala": {
+    "show": "Scala",
+    "highlight": "scala",
+    "version": "2.11.12",
+    "editor": "scala"
   }
 }
