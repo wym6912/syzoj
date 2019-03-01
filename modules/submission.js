@@ -35,6 +35,7 @@ app.get('/submissions', async (req, res) => {
       const contestId = Number(req.query.contest);
       const contest = await Contest.fromID(contestId);
       contest.ended = contest.isEnded();
+      if (curUser == null) throw new ErrorMessage('请登录后查看提交记录。', { '登录': syzoj.utils.makeUrl(['login'], { 'url': req.originalUrl }) });
       if ((contest.ended && contest.is_public) || // If the contest is ended and is not hidden
         (curUser && await contest.isSupervisior(curUser)) || // Or if the user have the permission to check
         (user.id === curUser.id) //Or if the user see his own submissions
