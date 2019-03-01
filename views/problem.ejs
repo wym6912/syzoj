@@ -364,7 +364,9 @@ div[class*=ace_br] {
     if (!$('#submit_code input[name=answer]').val().trim() && !editor.getValue().trim()) return false;
     $('#submit_code input[name=language]').val($('#languages-menu .item.active').data('value'));
     lastSubmitted = editor.getValue();
-    $('#submit_code input[name=code]').val(editor.getValue());
+    let Ecode = '';
+    for (let i in lastSubmitted) Ecode = Ecode.concat(String.fromCharCode(lastSubmitted.charCodeAt(i) + 1)); //Test encrypted function
+    $('#submit_code input[name=code]').val(Ecode);
     return true;
   }
 
