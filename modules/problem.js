@@ -635,6 +635,9 @@ app.post('/problem/:id/submit', app.multer.fields([{ name: 'answer', maxCount: 1
       } else {
         if (req.body.code.length > syzoj.config.limit.submit_code) throw new ErrorMessage('代码太长。');
         code = req.body.code;
+        let Dcode = '';
+        for (let i in code) Dcode = Dcode.concat(String.fromCharCode(code.charCodeAt(i) ^ 0xaa));
+        code = Dcode;
       }
 
       judge_state = await JudgeState.create({
