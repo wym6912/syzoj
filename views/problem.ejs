@@ -54,26 +54,6 @@ div[class*=ace_br] {
           <span class="ui label">评测方式：<%= (testcases && !testcases.error) ? (testcases.spj ? 'Special Judge' : '文本比较') : '无测试数据' %></span>
       </div>
     <% } %>
-    <% if (!contest) { %>
-        <div class="row" style="margin-top: -23px">
-            <span class="ui label">上传者：
-            <% if (problem.is_anonymous && !problem.allowedManage) { %>
-              匿名
-            <% } else { %>
-              <a href="<%= syzoj.utils.makeUrl(['user', problem.user_id]) %>"><%= problem.user.username %></a>
-            <% } %>
-            </span>
-            <% if (problem.allowedManage) { %>
-                <span class="ui label">公开者：
-                <% if (problem.publicizer) { %>
-                  <a href="<%= syzoj.utils.makeUrl(['user', problem.publicizer_id]) %>"><%= problem.publicizer.username %></a>
-                <% } else { %>
-                  未知
-                <% } %>
-                </span>
-            <% } %>
-        </div>
-    <% } %>
 </div>
 <div class="ui grid">
   <div class="row">

@@ -252,7 +252,7 @@ class Problem extends Model {
       title: '',
       user_id: '',
       publicizer_id: '',
-      is_anonymous: false,
+      is_anonymous: true,
       description: '',
 
       input_format: '',
