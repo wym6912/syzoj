@@ -738,7 +738,7 @@ app.get('/problem/:id/testdata', async (req, res) => {
     let problem = await Problem.fromID(id);
 
     if (!problem) throw new ErrorMessage('无此题目。');
-    if (!await problem.isAllowedEditBy(res.locals.user)) throw new ErrorMessage('您没有权限进行此操作。');
+    if (!await problem.isAllowedEditBy(res.locals.user)) throw new ErrorMessage('您没有权限查看测试数据。');
 
     let testdata = await problem.listTestdata();
     let testcases = await syzoj.utils.parseTestdata(problem.getTestdataPath(), problem.type === 'submit-answer');
