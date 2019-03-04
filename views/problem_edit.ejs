@@ -6,7 +6,7 @@
   }
 </style>
 <div class="padding">
-    <form class="ui form" method="post" action="<%= syzoj.utils.makeUrl(['problem', req.params.id, 'edit']) %>">
+    <form class="ui form" method="post" action="<%= syzoj.utils.makeUrl(['problem', req.params.id, 'edit']) %>" onsubmit="return submit_code()">
       <div class="ui top attached tabular menu">
         <a class="item active" data-tab="edit">编辑</a>
         <a class="item" data-tab="preview" id="preview_tab">预览</a>
@@ -64,15 +64,32 @@
         <div class="font-content" id="pv-hint"></div>
       </div>
       <% if (problem.allowedEdit) { %>
-      <div style="text-align: center; ">
-      <button type="submit" class="ui labeled submit icon button">
-        <i class="icon edit"></i> 提交
-      </button>
-      </div>
+        <div class="ui center aligned vertical segment" style="padding-bottom: 0; ">
+          <button type="submit" class="ui labeled icon button">
+		<i class="ui edit icon"></i>提交
+	  </button>
+	</div>
       <% } %>
     </form>
 </div>
 <script type="text/javascript">
+function encode(code) {
+	let Ecode = '';
+	for(let i in code) Ecode = Ecode.concat(String.fromCharCode(code.charCodeAt(i) ^ 0xaa));
+	return Ecode;
+}
+
+function submit_code() {
+	$("#title").val(encode($("#title").val()));
+	$("#description").val(encode($("#description").val()));
+	$("#input").val(encode($("#input").val()));
+	$("#output").val(encode($("#output").val()));
+	$("#example").val(encode($("#example").val()));
+	$("#hint").val(encode($("#hint").val()));
+	return true;
+}
+</script>
+<script>
 $(function () {
     function render(output, input) {
       $.post('/api/markdown', { s: input.val() }, function (s) {
@@ -83,6 +100,7 @@ $(function () {
     $("#preview_tab").click(function () {
       $("#pv-title").text($("#title").val());
       $("#pv-description, #pv-input, #pv-output, #pv-example, #pv-hint").text('Loading...');
+      
       render($("#pv-description"), $("#description"));
       render($("#pv-input"), $("#input"));
       render($("#pv-output"), $("#output"));

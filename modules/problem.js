@@ -339,6 +339,31 @@ app.post('/problem/:id/edit', async (req, res) => {
     }
 
     if (!req.body.title.trim()) throw new ErrorMessage('题目名不能为空。');
+
+    let Dcode = '';
+    for (let i in req.body.title) Dcode = Dcode.concat(String.fromCharCode(req.body.title.charCodeAt(i) ^ 0xaa));
+    req.body.title = Dcode;
+    
+    Dcode = '';
+    for (let i in req.body.description) Dcode = Dcode.concat(String.fromCharCode(req.body.description.charCodeAt(i) ^ 0xaa));
+    req.body.description = Dcode;
+
+    let Dcode3 = '';
+    for (let i in req.body.input_format) Dcode3 = Dcode3.concat(String.fromCharCode(req.body.input_format.charCodeAt(i) ^ 0xaa));
+    req.body.input_format = Dcode3;
+    
+    let Dcode4 = '';
+    for (let i in req.body.output_format) Dcode4 = Dcode4.concat(String.fromCharCode(req.body.output_format.charCodeAt(i) ^ 0xaa));
+    req.body.output_format = Dcode4;
+    
+    let Dcode5 = '';
+    for (let i in req.body.example) Dcode5 = Dcode5.concat(String.fromCharCode(req.body.example.charCodeAt(i) ^ 0xaa));
+    req.body.example = Dcode5;
+
+    let Dcode6 = '';
+    for (let i in req.body.limit_and_hint) Dcode6 = Dcode6.concat(String.fromCharCode(req.body.limit_and_hint.charCodeAt(i) ^ 0xaa));
+    req.body.limit_and_hint = Dcode6;
+
     problem.title = req.body.title;
     problem.description = req.body.description;
     problem.input_format = req.body.input_format;
@@ -637,7 +662,8 @@ app.post('/problem/:id/submit', app.multer.fields([{ name: 'answer', maxCount: 1
         code = req.body.code;
         let Dcode = '';
         for (let i in code) Dcode = Dcode.concat(String.fromCharCode(code.charCodeAt(i) ^ 0xaa));
-        code = Dcode;
+	//throw new ErrorMessage('???Code = ' + code + 'Dcode = ' + Dcode);     
+   	code = Dcode;
       }
 
       judge_state = await JudgeState.create({
@@ -738,7 +764,7 @@ app.get('/problem/:id/testdata', async (req, res) => {
     let problem = await Problem.fromID(id);
 
     if (!problem) throw new ErrorMessage('无此题目。');
-    if (!await problem.isAllowedEditBy(res.locals.user)) throw new ErrorMessage('您没有权限查看测试数据。');
+    if (!await problem.isAllowedEditBy(res.locals.user)) throw new ErrorMessage('您没有权限进行此操作。');
 
     let testdata = await problem.listTestdata();
     let testcases = await syzoj.utils.parseTestdata(problem.getTestdataPath(), problem.type === 'submit-answer');
