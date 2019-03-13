@@ -155,14 +155,14 @@ app.get('/contest/:id', async (req, res) => {
             problem.feedback = (judge_state.score * multiplier).toString() + ' / ' + (100 * multiplier).toString();
           }
         } else if (contest.type === 'ieee') {
-            if (player.score_details[problem.problem.id]) {
-              let judge_state = await JudgeState.fromID(player.score_details[problem.problem.id].judge_id);
-              problem.status = judge_state.status;
-              problem.judge_id = player.score_details[problem.problem.id].judge_id;
-              await contest.loadRelationships();
-              let multiplier = contest.ranklist.ranking_params[problem.problem.id] || 1.0;
-              problem.feedback = (judge_state.score * multiplier).toString() + ' / ' + (100 * multiplier).toString();
-            }
+          if (player.score_details[problem.problem.id]) {
+            let judge_state = await JudgeState.fromID(player.score_details[problem.problem.id].judge_id);
+            problem.status = judge_state.status;
+            problem.judge_id = player.score_details[problem.problem.id].judge_id;
+            await contest.loadRelationships();
+            let multiplier = contest.ranklist.ranking_params[problem.problem.id] || 1.0;
+            problem.feedback = (judge_state.score * multiplier).toString() + ' / ' + (100 * multiplier).toString();
+          }
         } else if (contest.type === 'acm') {
           if (player.score_details[problem.problem.id]) {
             problem.status = {
@@ -228,14 +228,21 @@ app.get('/contest/:id/ranklist', async (req, res) => {
     if (!contest) throw new ErrorMessage('无此比赛。');
     if (!contest.is_public && (!res.locals.user || !res.locals.user.is_admin)) throw new ErrorMessage('比赛未公开，请耐心等待 (´∀ `)');
     if ([contest.allowedSeeingResult(),//同步修改在 contest.ejs 上应用的权限  //&& contest.allowedSeeingOthers(),
-    contest.isEnded(),
-    await contest.isSupervisior(curUser)].every(x => !x))
+      contest.isEnded(),
+      await contest.isSupervisior(curUser)].every(x => !x))
       throw new ErrorMessage('您没有权限进行此操作。');
 
     await contest.loadRelationships();
 
     let players_id = [];
+
     for (let i = 1; i <= contest.ranklist.ranklist.player_num; i++) players_id.push(contest.ranklist.ranklist[i]);
+
+    let SubmissionScore = new Array();
+    let CPTmp = contest.problems.split('|');
+    let Contestants = players_id.length;
+    let NumberofProblems = CPTmp.length;
+    for(let i = 1; i <= NumberofProblems; ++ i) SubmissionScore[i] = 0;
 
     let ranklist = await players_id.mapAsync(async player_id => {
       let player = await ContestPlayer.fromID(player_id);
@@ -244,13 +251,32 @@ app.get('/contest/:id/ranklist', async (req, res) => {
         player.score = 0;
       }
 
+      if(contest.type === 'ieee'){
+        for (let i in player.score_details) {
+          player.score_details[i].judge_state = await JudgeState.fromID(player.score_details[i].judge_id);
+
+          if (player.score_details[i].score != null) {
+            SubmissionScore[player.score_details[i].judge_state.problem_id] += player.score_details[i].score;
+          }
+        }
+      }
+
       for (let i in player.score_details) {
         player.score_details[i].judge_state = await JudgeState.fromID(player.score_details[i].judge_id);
 
         /*** XXX: Clumsy duplication, see ContestRanklist::updatePlayer() ***/
-        if (contest.type === 'ioi' || contest.type === 'ieee') {
+        if (contest.type === 'ioi') {
           let multiplier = contest.ranklist.ranking_params[i] || 1.0;
           player.score_details[i].weighted_score = player.score_details[i].score == null ? null : Math.round(player.score_details[i].score * multiplier);
+          player.score += player.score_details[i].weighted_score;
+        } else if (contest.type === 'ieee') {
+          let multiplier = contest.ranklist.ranking_params[i] || 1.0;
+          //let tmp1 = 1.0 - SubmissionScore[player.score_details[i].judge_state.problem_id] / (100.0 * Contestants);
+          //let tmp2 = (30.0 + 70.0 * tmp1 * tmp1) / 100.0;
+          //player.score_details[i].weighted_score = player.score_details[i].score == null ? null : Math.round(100.0 * player.score_details[i].score * multiplier * tmp2) / 100.0;
+          player.score_details[i].weighted_score = player.score_details[i].score == null ? null : (player.score_details[i].score * multiplier * (0.3 + 0.7 * (1.0 - SubmissionScore[player.score_details[i].judge_state.problem_id] / (100.0 * Contestants) ) * (1.0 - SubmissionScore[player.score_details[i].judge_state.problem_id] / (100.0 * Contestants) )));
+          //player.score_details[i].weighted_score = player.score_details[i].score == null ? null : (player.score_details[i].judge_state.problem_id);
+          //player.score_details[i].weighted_score = player.score_details[i].score == null ? null : (SubmissionScore[player.score_details[i].judge_state.problem_id]);
           player.score += player.score_details[i].weighted_score;
         }
       }
@@ -401,39 +427,39 @@ app.get('/contest/submission/:id', async (req, res) => {
     if(! curUser) throw new ErrorMessage("您没有权限执行此操作(用户权限不足)");
 
     //if (judge.type !== 1) {
-      return res.redirect(syzoj.utils.makeUrl(['submission', id])); //强行让所有的链接指向原来的提交链接
+    return res.redirect(syzoj.utils.makeUrl(['submission', id])); //强行让所有的链接指向原来的提交链接
     //}
-/*
-    const contest = await Contest.fromID(judge.type_info);
-    contest.ended = contest.isEnded();
+    /*
+        const contest = await Contest.fromID(judge.type_info);
+        contest.ended = contest.isEnded();
 
-    const displayConfig = getDisplayConfig(contest);
-    displayConfig.showCode = true;
+        const displayConfig = getDisplayConfig(contest);
+        displayConfig.showCode = true;
 
-    await judge.loadRelationships();
-    const problems_id = await contest.getProblems();
-    judge.problem_id = problems_id.indexOf(judge.problem_id) + 1;
-    judge.problem.title = syzoj.utils.removeTitleTag(judge.problem.title);
+        await judge.loadRelationships();
+        const problems_id = await contest.getProblems();
+        judge.problem_id = problems_id.indexOf(judge.problem_id) + 1;
+        judge.problem.title = syzoj.utils.removeTitleTag(judge.problem.title);
 
-    if (judge.problem.type !== 'submit-answer') {
-      judge.codeLength = judge.code.length;
-      judge.code = await syzoj.utils.highlight(judge.code, syzoj.languages[judge.language].highlight);
-    }
+        if (judge.problem.type !== 'submit-answer') {
+          judge.codeLength = judge.code.length;
+          judge.code = await syzoj.utils.highlight(judge.code, syzoj.languages[judge.language].highlight);
+        }
 
-    res.render('submission', {
-      info: getSubmissionInfo(judge, displayConfig),
-      roughResult: getRoughResult(judge, displayConfig),
-      code: (displayConfig.showCode && judge.problem.type !== 'submit-answer') ? judge.code.toString("utf8") : '',
-      detailResult: processOverallResult(judge.result, displayConfig),
-      socketToken: (displayConfig.showDetailResult && judge.pending && x.task_id != null) ? jwt.sign({
-        taskId: judge.task_id,
-        displayConfig: displayConfig,
-        type: 'detail'
-      }, syzoj.config.session_secret) : null,
-      displayConfig: displayConfig,
-      contest: contest,
-    });
-    */
+        res.render('submission', {
+          info: getSubmissionInfo(judge, displayConfig),
+          roughResult: getRoughResult(judge, displayConfig),
+          code: (displayConfig.showCode && judge.problem.type !== 'submit-answer') ? judge.code.toString("utf8") : '',
+          detailResult: processOverallResult(judge.result, displayConfig),
+          socketToken: (displayConfig.showDetailResult && judge.pending && x.task_id != null) ? jwt.sign({
+            taskId: judge.task_id,
+            displayConfig: displayConfig,
+            type: 'detail'
+          }, syzoj.config.session_secret) : null,
+          displayConfig: displayConfig,
+          contest: contest,
+        });
+        */
   } catch (e) {
     syzoj.log(e);
     res.render('error', {

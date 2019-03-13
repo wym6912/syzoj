@@ -46,7 +46,7 @@ class ContestRanklist extends Model {
 
     let JudgeState = syzoj.model('judge_state');
 
-    if (contest.type === 'ioi' || contest.type === 'ieee') {
+    if (contest.type === 'ioi') {
       for (let player of players) {
         player.latest = 0;
         player.score = 0;
@@ -58,6 +58,45 @@ class ContestRanklist extends Model {
           if (player.score_details[i].score != null) {
             let multiplier = this.ranking_params[i] || 1.0;
             player.score_details[i].weighted_score = Math.round(player.score_details[i].score * multiplier);
+            player.score += player.score_details[i].weighted_score;
+          }
+        }
+      }
+
+      players.sort((a, b) => {
+        if (a.score > b.score) return -1;
+        if (b.score > a.score) return 1;
+        if (a.latest < b.latest) return -1;
+        if (a.latest > b.latest) return 1;
+        return 0;
+      });
+    } else if (contest.type === 'ieee') {
+      let Contestants = players.length;
+      let SubmissionScore = new Array();
+      let CPTmp = contest.problems.split('|');
+      let NumberofProblems = CPTmp.length;
+      for(let i = 1; i <= NumberofProblems; ++ i) SubmissionScore[i] = 0;
+      for (let player of players) { //Get all contestants' scores and calculate the time
+        player.latest = 0;
+        for (let i in player.score_details) {
+          let judge_state = await JudgeState.fromID(player.score_details[i].judge_id);
+          player.latest = Math.max(player.latest, judge_state.submit_time);
+
+          if (player.score_details[i].score != null) {
+            SubmissionScore[judge_state.problem_id] += player.score_details[i].score;
+          }
+        }
+      }
+
+      for (let player of players) { //Calculate the scores
+        player.score = 0;
+        for (let i in player.score_details) {
+          let judge_state = await JudgeState.fromID(player.score_details[i].judge_id);
+          if (player.score_details[i].score != null) {
+            let multiplier = this.ranking_params[i] || 1.0;
+            //player.score_details[i].weighted_score = Math.round(100.0 - player.score_details[i].score * multiplier);
+            //player.score_details[i].weighted_score = Math.round(SubmissionScore[judge_state.problem_id]);
+            player.score_details[i].weighted_score = Math.round(player.score_details[i].score * multiplier * (0.3 + 0.7 * (1.0 - SubmissionScore[judge_state.problem_id] / (100.0 * Contestants) ) * (1.0 - SubmissionScore[judge_state.problem_id] / (100.0 * Contestants) )));
             player.score += player.score_details[i].weighted_score;
           }
         }
