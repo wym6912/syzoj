@@ -96,7 +96,7 @@ class ContestRanklist extends Model {
             let multiplier = this.ranking_params[i] || 1.0;
             //player.score_details[i].weighted_score = Math.round(100.0 - player.score_details[i].score * multiplier);
             //player.score_details[i].weighted_score = Math.round(SubmissionScore[judge_state.problem_id]);
-            player.score_details[i].weighted_score = Math.round(player.score_details[i].score * multiplier * (0.3 + 0.7 * (1.0 - SubmissionScore[judge_state.problem_id] / (100.0 * Contestants) ) * (1.0 - SubmissionScore[judge_state.problem_id] / (100.0 * Contestants) )));
+            player.score_details[i].weighted_score = player.score_details[i].score * multiplier * (0.3 + 0.7 * (1.0 - SubmissionScore[judge_state.problem_id] / (100.0 * Contestants) ) * (1.0 - SubmissionScore[judge_state.problem_id] / (100.0 * Contestants) ));
             player.score += player.score_details[i].weighted_score;
           }
         }
