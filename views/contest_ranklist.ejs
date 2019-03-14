@@ -129,11 +129,17 @@
               <% if (item.player.score_details[problem.id].weighted_score != null) { %>
                 <span class="score score_<%= parseInt((item.player.score_details[problem.id].score / 10) || 0) %>">
                             <%= Math.round(item.player.score_details[problem.id].weighted_score * 100.0) / 100.0 %>
-                          </span>
+                  <% if (contest.type === 'ieee' ) { %>
+                    <p> (<%= Math.round(item.player.score_details[problem.id].score * 100.0) / 100.0 %>) </p>
+                  <% } %>
+                </span>
               <% } else { %>
                 <span class="status compile_error">
                             0
-                          </span>
+                  <% if (contest.type === 'ieee' ) { %>
+                    <p> (0) </p>
+                  <% } %>
+                </span>
               <% } %>
             </a>
             <div class="submit_time">
