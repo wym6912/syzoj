@@ -241,7 +241,7 @@ app.get('/contest/:id/ranklist', async (req, res) => {
     let SubmissionScore = new Array();
     let CPTmp = contest.problems.split('|');
     let Contestants = players_id.length;
-    let NumberofProblems = CPTmp.length;
+    let NumberofProblems = Math.max.apply(null, CPTmp);
     for(let i = 1; i <= NumberofProblems; ++ i) SubmissionScore[i] = 0;
 
     let ranklist = await players_id.mapAsync(async player_id => {
